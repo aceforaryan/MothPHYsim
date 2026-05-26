@@ -14,11 +14,44 @@ This is a comprehensive, highly-modular simulator for a MIMO-OFDM wireless commu
 - `mimo_ofdm/channel/`: TDL Fading, AWGN
 - `mimo_ofdm/estimation/`: Pilot insertion, LS/MMSE Channel Estimation
 - `mimo_ofdm/equalization/`: ZF/MMSE Equalization
-- `mimo_ofdm/extensions/`: Advanced V2 features like Sphere decoding
+- `mimo_ofdm/extensions/`: Advanced V2 features like Sphere decoding and Water Filling
 - `experiments/`: Harness for comparing estimators, modulation, and MIMO schemes
 
 ## Quick Start
+Install dependencies using `uv` or pip:
 ```bash
 uv pip install -r requirements.txt
+# or
+pip install -r requirements.txt
+```
+
+Run the core simulation pipeline (generates explainability plots):
+```bash
 python main.py
+```
+
+*Note: In `main.py`, set `show=True` in the `explainability_pipeline()` call to interactively view the constellation, pilot maps, and equalized bits!*
+
+## Running Experiments
+The project includes an experiment harness to evaluate various system parameters over an SNR range.
+
+1. **Compare Estimators (LS vs MMSE):**
+```bash
+python experiments/compare_estimators.py
+```
+
+2. **Compare Modulation (QPSK vs 16-QAM):**
+```bash
+python experiments/compare_modulation.py
+```
+
+3. **Compare MIMO Configurations (2x2 vs 4x4) (Stub):**
+```bash
+python experiments/compare_mimo.py
+```
+
+## Running Tests
+Run the comprehensive `pytest` suite:
+```bash
+pytest tests/
 ```
