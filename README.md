@@ -18,16 +18,23 @@ This is a comprehensive, highly-modular simulator for a MIMO-OFDM wireless commu
 - `experiments/`: Harness for comparing estimators, modulation, and MIMO schemes
 
 ## Quick Start
-Install dependencies using `uv` or pip:
+Install dependencies and sync the virtual environment using `uv`:
 ```bash
-uv pip install -r requirements.txt
-# or
+uv sync
+```
+
+Alternatively, you can install the dependencies via pip:
+```bash
 pip install -r requirements.txt
 ```
 
+### Running the System
+If you are using `uv`, you can prefix execution with `uv run`. Otherwise, ensure your virtual environment is activated.
+
 Run the core simulation pipeline (generates explainability plots):
 ```bash
-python main.py
+uv run python main.py
+# or if environment is activated: python main.py
 ```
 
 *Note: In `main.py`, set `show=True` in the `explainability_pipeline()` call to interactively view the constellation, pilot maps, and equalized bits!*
@@ -37,21 +44,22 @@ The project includes an experiment harness to evaluate various system parameters
 
 1. **Compare Estimators (LS vs MMSE):**
 ```bash
-python experiments/compare_estimators.py
+uv run python experiments/compare_estimators.py
 ```
 
 2. **Compare Modulation (QPSK vs 16-QAM):**
 ```bash
-python experiments/compare_modulation.py
+uv run python experiments/compare_modulation.py
 ```
 
 3. **Compare MIMO Configurations (2x2 vs 4x4) (Stub):**
 ```bash
-python experiments/compare_mimo.py
+uv run python experiments/compare_mimo.py
 ```
 
 ## Running Tests
 Run the comprehensive `pytest` suite:
 ```bash
-pytest tests/
+uv run pytest tests/
 ```
+
