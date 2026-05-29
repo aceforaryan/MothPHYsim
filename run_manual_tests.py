@@ -180,10 +180,15 @@ def run_mimo_detector_comparison():
         for t in range(n_tx):
             tx_symbols_antenna = tx_streams[t].reshape(n_ofdm_symbols, n_data)
             tx_grid[t] = pilots.insert(tx_symbols_antenna)
-            
+
+        # Normalise total transmitted power to 1 regardless of the number of antennas.
+        # Without this, a 4x4 system transmits 4x the power of 2x2 at the same noise
+        # variance, making per-stream SNR comparisons unfair.
+        tx_grid = tx_grid / np.sqrt(n_tx)
+
         # Channel generation
         H = multiplexer.generate_channel_matrix(n_subcarriers) # (n_rx, n_tx, n_subcarriers)
-        
+
         # Apply MIMO channel and noise
         noise_var = 10 ** (-snr_db / 10)
         rx_grid = np.zeros((n_rx, n_ofdm_symbols, n_subcarriers), dtype=complex)

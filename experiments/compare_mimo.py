@@ -38,7 +38,13 @@ def simulate_mimo(n_tx, n_rx, snr_range, demod_type='ZF'):
     for t in range(n_tx):
         tx_symbols_antenna = tx_streams[t].reshape(n_ofdm_symbols, n_data_subcarriers)
         tx_grid[t] = pilots.insert(tx_symbols_antenna)
-        
+
+    # Normalise total transmitted power to 1 regardless of the number of antennas.
+    # Without this, a 4x4 system transmits 4x the power of a 2x2 system at the same
+    # noise_var, making per-stream SNR comparisons unfair and causing ZF noise
+    # amplification to dominate for larger arrays.
+    tx_grid = tx_grid / np.sqrt(n_tx)
+    
     # Generate MIMO channel matrix H (n_rx, n_tx, n_subcarriers)
     H = multiplexer.generate_channel_matrix(n_subcarriers)
     
