@@ -113,7 +113,7 @@ def run_experiment():
     plt.semilogy(snr_range, ber_4x4_mmse, 'x--', color='#30336b', label='4x4 MIMO (MMSE)')
     
     plt.title("BER vs SNR: MIMO Spatial Multiplexing (2x2 vs 4x4)", fontsize=14, fontweight='bold')
-    plt.xlabel("SNR (dB)", fontsize=12)
+    plt.xlabel("SNR — Es/N0 (dB)", fontsize=12)
     plt.ylabel("Bit Error Rate (BER)", fontsize=12)
     plt.grid(True, which="both", ls="-", alpha=0.5)
     plt.legend(fontsize=11)

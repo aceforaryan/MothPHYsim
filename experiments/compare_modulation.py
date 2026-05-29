@@ -13,9 +13,9 @@ def run_experiment():
     snr_range = np.arange(0, 31, 5)
     ber_qpsk = []
     ber_16qam = []
-    
+
     n_subcarriers = 64
-    n_ofdm_symbols = 50
+    n_ofdm_symbols = 200  # Increased from 50 to ensure enough bits at high SNR
     
     ofdm = OFDM(n_subcarriers=n_subcarriers)
     pilots = PilotInserter(n_subcarriers=n_subcarriers)
@@ -44,22 +44,33 @@ def run_experiment():
         p_qpsk, d_qpsk = pilots.extract(rx_grid_qpsk)
         rx_bits_qpsk = mod_qpsk.demodulate(equalizer.equalize(d_qpsk, estimator.estimate(p_qpsk), pilots.data_indices).flatten())
         ber_qpsk.append(calculate_ber(tx_bits_qpsk, rx_bits_qpsk))
-        
+
         # 16QAM Rx
         rx_grid_16qam = ofdm.demodulate(noise.apply(faded_16qam, snr).reshape(n_ofdm_symbols, -1))
         p_16qam, d_16qam = pilots.extract(rx_grid_16qam)
         rx_bits_16qam = mod_16qam.demodulate(equalizer.equalize(d_16qam, estimator.estimate(p_16qam), pilots.data_indices).flatten())
         ber_16qam.append(calculate_ber(tx_bits_16qam, rx_bits_16qam))
         
+    # Apply BER floor so zero-error SNR points stay visible on log axis
+    n_bits_qpsk = n_ofdm_symbols * len(pilots.data_indices) * mod_qpsk.k
+    n_bits_16qam = n_ofdm_symbols * len(pilots.data_indices) * mod_16qam.k
+    ber_qpsk  = [max(b, 0.5 / n_bits_qpsk)  for b in ber_qpsk]
+    ber_16qam = [max(b, 0.5 / n_bits_16qam) for b in ber_16qam]
+
     plt.figure()
     plt.semilogy(snr_range, ber_qpsk, 'o-', label='QPSK')
     plt.semilogy(snr_range, ber_16qam, 's--', label='16-QAM')
-    plt.title("BER vs SNR: Modulation Schemes")
-    plt.xlabel("SNR (dB)")
+    plt.title("BER vs SNR: Modulation Schemes\n(TDL Rayleigh fading, LS estimation, ZF equaliser)")
+    # The AWGNChannel uses Es/N0 (energy-per-symbol / noise).  To convert to
+    # Eb/N0 for textbook comparison, subtract 10*log10(k) where k=log2(M):
+    #   QPSK:   Es/N0 = Eb/N0 + 3 dB
+    #   16-QAM: Es/N0 = Eb/N0 + 6 dB
+    plt.xlabel("SNR — Es/N0 (dB)")
     plt.ylabel("Bit Error Rate (BER)")
     plt.grid(True, which="both", ls="-")
     plt.legend()
-    plt.savefig("compare_modulation.png")
+    plt.tight_layout()
+    plt.savefig("compare_modulation.png", dpi=150)
     print("Saved plot to compare_modulation.png")
 
 if __name__ == "__main__":
